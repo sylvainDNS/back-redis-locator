@@ -1,16 +1,24 @@
 const uuidv4 = require('uuid/v4')
 const redis = require('redis')
+const Hapi = require('hapi')
 
-const client = redis.createClient()
+const redisClient = redis.createClient()
 
-client.on('error', (err) => {
-    console.log('Error : ' + err)
+const server = Hapi.server({
+    port: 3000,
+    host: 'localhost'
 })
 
-const stdin = process.openStdin();
+const initServer = async () => {
+    await server.start();
+    console.log(`Server running at: ${server.info.uri}`);
+}
 
-stdin.addListener("data", function (d) {
-    const uuid = uuidv4()
-    console.log(uuid)
-    client.hset("saisie", uuid, d.toString().trim(), redis.print)
-})
+
+process.on('unhandledRejection', (err) => {
+
+    console.log(err);
+    process.exit(1);
+});
+
+initServer();
