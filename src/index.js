@@ -10,5 +10,7 @@ client.on('error', (err) => {
 const stdin = process.openStdin();
 
 stdin.addListener("data", function (d) {
-    client.hset("saisie", uuidv4(), d.toString().trim(), redis.print)
+    const uuid = uuidv4()
+    console.log(uuid)
+    client.hset("saisie", uuid, d.toString().trim(), redis.print)
 })
