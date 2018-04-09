@@ -1,7 +1,7 @@
-import Location from '.location'
+import Geoloc from '.geoloc'
 
 export default function (conn) {
     return {
-        Location: Location(conn)
+        Geoloc: Geoloc(conn)
     }
 }
