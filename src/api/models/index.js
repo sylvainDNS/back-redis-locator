@@ -1,4 +1,4 @@
-import Geoloc from '.geoloc'
+import Geoloc from './geoloc'
 
 export default function (conn) {
     return {

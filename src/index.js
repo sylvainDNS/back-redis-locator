@@ -1,22 +1,13 @@
-const redis = require('redis')
-const Hapi = require('hapi')
+import start from './server'
+import { Server } from 'hapi'
 
-const conn = redis.createClient()
-
-const server = Hapi.server({
-    port: 3000,
-    host: 'localhost'
-})
-
-const initServer = async () => {
-    await server.start();
-    console.log(`Server running at: ${server.info.uri}`);
+function onStart(server) {
+    console.log(`Server started : 
+    -> host : ${server.info.host}
+    -> port : ${server.info.port}`)
 }
-
-process.on('unhandledRejection', (err) => {
-    console.log(err)
+function onCrash(error) {
+    console.error(error)
     process.exit(1)
-})
-
-
-initServer()
+}
+start().subscribe(onStart, onCrash)
