@@ -10,4 +10,5 @@ function onCrash(error) {
     console.error(error)
     process.exit(1)
 }
+
 start().subscribe(onStart, onCrash)
