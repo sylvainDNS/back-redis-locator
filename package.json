@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "watch": "webpack --watch",
+    "watch": "webpack --watch  --mode development",
     "start": "nodemon dist/main.js"
   },
   "license": "MIT",
   "dependencies": {
+    "babel-loader": "^7.1.4",
     "hapi": "^17.3.1",
     "hiredis": "^0.5.0",
     "redis": "^2.8.0",
