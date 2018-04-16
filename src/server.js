@@ -1,20 +1,18 @@
 import { Server } from 'hapi'
-import Api from './api'
 import { Observable } from 'rxjs'
-const redis = require('redis')
+import redis from 'redis'
+import { GeoListener } from './api/geoListener'
+
 export default function start() {
 
     const conn = redis.createClient()
 
     const server = new Server({
-        host: 'localhost',
-        port: 3000,
+        host: '127.0.0.1',
+        port: 3500,
         routes: { cors: { origin: ['*'] } }
     })
+    GeoListener(server)
 
-    Api(server, conn)
-
-    return Observable
-        .fromPromise(server.start())
-        .mapTo(server)
+    return server
 }
