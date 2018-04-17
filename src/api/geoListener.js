@@ -17,6 +17,7 @@ export const GeoListener = (server, db, schema) => {
     server.route({
         method: 'POST',
         path: '/',
+        options: { validate: { payload: schema } },
         handler: async (request, h) => {
             const { long, lat, username } = request.payload
             const uuid = uuidv4()
@@ -32,7 +33,6 @@ export const GeoListener = (server, db, schema) => {
             await db.set(uuid, JSON.stringify(geoUser))
 
             return 'yep'
-        },
-        options: { validate: { payload: schema } }
+        }
     })
 }
