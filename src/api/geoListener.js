@@ -19,21 +19,23 @@ export const GeoListener = (server, io, client, schema) => {
     })
 
     client.sub.subscribe('mapsChannel')
-    client.sub.on('message', (channel, uuid) => {
-        socketList.forEach(keyValue => {
+    client.sub.on('message', async (channel, uuid) => {
+        await socketList.forEach(keyValue => {
             client.pub.georadiusbymember(
                 'maps',
                 keyValue.uuid,
                 keyValue.radius,
                 'km',
-                (err, reply) => {
+                async (err, reply) => {
                     if (!err) {
-                        if (reply.indexOf(uuid.toString()) > -1) {
-                            keyValue.socket.emit('addGeo', { reply: 'ye$$$$' })
-                            console.log('ye$$$$$$')
-                        } else {
-                            keyValue.socket.emit('addGeo', { reply: 'Nop€€€€' })
-                            console.log('Nop€€€€')
+                        if ((await reply.indexOf(uuid.toString())) > -1) {
+                            client.pub.geopos('maps', uuid.toString(), async (err, reply) => {
+                                await keyValue.socket.emit('addGeo', {
+                                    uuid: uuid.toString(),
+                                    long: reply[0][0],
+                                    lat: reply[0][1]
+                                })
+                            })
                         }
                     }
                 }
