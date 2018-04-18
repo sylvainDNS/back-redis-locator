@@ -7,20 +7,39 @@ export const GeoListener = (server, io, client, schema) => {
 
     io.on('connection', socket => {
         const params = JSON.parse(socket.handshake.query.params)
-        const obj = { socket: socket, uuid: params.uuid }
+        const newKeyValue = { socket: socket, uuid: params.uuid.toString(), radius: params.radius }
 
-        socketList.push(obj)
+        socketList.push(newKeyValue)
 
         socket.on('disconnect', () => {
-            const socketUuid = socketList.find(el => el.uuid === socketUuid)
+            const socketUuid = socketList.find(el => el.uuid === params.uuid)
             socketList = socketList.filter(el => el.uuid != socketUuid)
-            io.emit('User disconnected.')
+            io.emit('User disconnected')
         })
     })
 
     client.sub.subscribe('mapsChannel')
     client.sub.on('message', (channel, uuid) => {
-        console.log('uuid : ' + uuid)
+        socketList.forEach(keyValue => {
+            client.pub.georadiusbymember(
+                'maps',
+                keyValue.uuid,
+                keyValue.radius,
+                'km',
+                (err, reply) => {
+                    if (!err) {
+                        if (reply.indexOf(uuid.toString()) > -1) {
+                            keyValue.socket.emit('addGeo', { reply: 'ye$$$$' })
+                            console.log('ye$$$$$$')
+                        } else {
+                            keyValue.socket.emit('addGeo', { reply: 'Nop€€€€' })
+                            console.log('Nop€€€€')
+                        }
+                    }
+                }
+            )
+            console.log(keyValue.uuid)
+        })
     })
 
     server.route({
