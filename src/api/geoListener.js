@@ -2,16 +2,25 @@ import Joi from 'joi'
 import uuidv4 from 'uuid/v4'
 import moment from 'moment'
 
-export const GeoListener = (server, db, schema) => {
-    server.route({
-        method: 'GET',
-        path: '/',
-        handler: async (request, h) => {
-            const { long, lat, radius, unit } = request.query
+export const GeoListener = (server, io, client, schema) => {
+    let socketList = []
 
-            return await db.georadiusbymember('maps', '50', '50', '1', 'km')
-            // return await db.georadiusbymember('maps', long, lat, radius, 'km')
-        }
+    io.on('connection', socket => {
+        const params = JSON.parse(socket.handshake.query.params)
+        const obj = { socket: socket, uuid: params.uuid }
+
+        socketList.push(obj)
+
+        socket.on('disconnect', () => {
+            const socketUuid = socketList.find(el => el.uuid === socketUuid)
+            socketList = socketList.filter(el => el.uuid != socketUuid)
+            io.emit('User disconnected.')
+        })
+    })
+
+    client.sub.subscribe('mapsChannel')
+    client.sub.on('message', (channel, uuid) => {
+        console.log('uuid : ' + uuid)
     })
 
     server.route({
@@ -29,8 +38,9 @@ export const GeoListener = (server, db, schema) => {
                 y: lat
             }
 
-            await db.geoadd('maps', long, lat, uuid)
-            await db.set(uuid, JSON.stringify(geoUser))
+            await client.pub.geoadd('maps', long, lat, uuid)
+            await client.pub.set(uuid, JSON.stringify(geoUser))
+            await client.pub.publish('mapsChannel', uuid)
 
             return 'yep'
         }
