@@ -9,22 +9,26 @@ export const GeoListener = (server, io, client, schema) => {
         const params = JSON.parse(socket.handshake.query.params)
         const newNode = {
             socket: socket,
-            username: params.username.toString(),
+            username: params.username,
+            long: params.long,
+            lat: params.lat,
             radius: params.radius
         }
 
         socketList.push(newNode)
 
-        socket.on('setRadius', data => {
+        socket.on('setPosition', data => {
             const node = socketList[socketList.findIndex(el => el.username === params.username)]
             socketList = socketList.filter(el => el.username != params.username)
 
-            socketList.push(Object.assign({}, node, { radius: data.radius }))
+            socketList.push(
+                Object.assign({}, node, { long: data.long, lat: data.lat, radius: data.radius })
+            )
         })
 
         socket.on('disconnect', () => {
             socketList = socketList.filter(el => el.username != params.username)
-            io.emit('User disconnected')
+            io.emit('User "' + params.username + '" disconnected')
         })
     })
 
