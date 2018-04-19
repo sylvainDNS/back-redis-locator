@@ -5,7 +5,7 @@
     "scripts": {
         "watch": "webpack --watch --mode development",
         "start": "nodemon dist/main.js",
-        "build": "webpack --watch --mode production"
+        "build": "webpack --mode production"
     },
     "license": "MIT",
     "dependencies": {
