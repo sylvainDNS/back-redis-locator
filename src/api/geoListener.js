@@ -35,6 +35,9 @@ export const GeoListener = (server, io, client, schema) => {
 
     client.sub.subscribe('mapsChannel')
     client.sub.on('message', async (channel, uuid) => {
+        console.log(
+            'Message "' + uuid.toString() + '" receive on channel "' + channel.toString() + '"'
+        )
         await socketList.forEach(node => {
             client.pub.georadiusbymember(
                 'maps',
