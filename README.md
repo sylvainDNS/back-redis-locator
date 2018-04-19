@@ -1,5 +1,17 @@
 # back-redis-locator
 
+## COMMON-ENV
+
+`export REDIS_HOST=`
+
+`export REDIS_PORT=`
+
+`export HAPI_HOST=`
+
+`export HAPI_PORT=`
+
+## Socket specs
+
 ### Socket handshake parameter sample :
 
 `{"query": "params={\"uuid\":\"f65eebe2-aa4d-4fe5-80f4-0026e4cc47f7\", \"username\":\"dns\", \"radius\":\"2\"}"}`

@@ -15,17 +15,15 @@ export const GeoListener = (server, io, client, schema) => {
             const node = socketList[socketList.findIndex(el => el.uuid === params.uuid)]
             socketList = socketList.filter(el => el.uuid != params.uuid)
 
-            node.uuid = data.uuid
             params.uuid = data.uuid
-            socketList.push(node)
+            socketList.push(Object.assign({}, node, { uuid: data.uuid }))
         })
 
         socket.on('setRadius', data => {
             const node = socketList[socketList.findIndex(el => el.uuid === params.uuid)]
             socketList = socketList.filter(el => el.uuid != params.uuid)
 
-            node.radius = data.radius
-            socketList.push(node)
+            socketList.push(Object.assign({}, node, { radius: data.radius }))
         })
 
         socket.on('disconnect', () => {
