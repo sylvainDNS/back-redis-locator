@@ -7,49 +7,44 @@ export const GeoListener = (server, io, client, schema) => {
 
     io.on('connection', socket => {
         const params = JSON.parse(socket.handshake.query.params)
-        const newNode = { socket: socket, uuid: params.uuid.toString(), radius: params.radius }
+        const newNode = {
+            socket: socket,
+            username: params.username.toString(),
+            radius: params.radius
+        }
 
         socketList.push(newNode)
 
-        socket.on('setUuid', data => {
-            const node = socketList[socketList.findIndex(el => el.uuid === params.uuid)]
-            socketList = socketList.filter(el => el.uuid != params.uuid)
-
-            params.uuid = data.uuid
-            socketList.push(Object.assign({}, node, { uuid: data.uuid }))
-        })
-
         socket.on('setRadius', data => {
-            const node = socketList[socketList.findIndex(el => el.uuid === params.uuid)]
-            socketList = socketList.filter(el => el.uuid != params.uuid)
+            const node = socketList[socketList.findIndex(el => el.username === params.username)]
+            socketList = socketList.filter(el => el.username != params.username)
 
             socketList.push(Object.assign({}, node, { radius: data.radius }))
         })
 
         socket.on('disconnect', () => {
-            const socketUuid = socketList.find(el => el.uuid === params.uuid)
-            socketList = socketList.filter(el => el.uuid != socketUuid)
+            socketList = socketList.filter(el => el.username != params.username)
             io.emit('User disconnected')
         })
     })
 
     client.sub.subscribe('mapsChannel')
-    client.sub.on('message', async (channel, uuid) => {
+    client.sub.on('message', async (channel, username) => {
         console.log(
-            'Message "' + uuid.toString() + '" receive on channel "' + channel.toString() + '"'
+            'Message "' + username.toString() + '" received on channel "' + channel.toString() + '"'
         )
         await socketList.forEach(node => {
             client.pub.georadiusbymember(
                 'maps',
-                node.uuid,
+                node.username,
                 node.radius,
                 'km',
                 async (err, reply) => {
                     if (!err) {
-                        if ((await reply.indexOf(uuid.toString())) > -1) {
-                            client.pub.geopos('maps', uuid.toString(), async (err, reply) => {
+                        if ((await reply.indexOf(username.toString())) > -1) {
+                            client.pub.geopos('maps', username.toString(), async (err, reply) => {
                                 await node.socket.emit('addGeo', {
-                                    uuid: uuid.toString(),
+                                    username: username.toString(),
                                     long: reply[0][0],
                                     lat: reply[0][1]
                                 })
@@ -78,7 +73,7 @@ export const GeoListener = (server, io, client, schema) => {
 
             await client.pub.geoadd('maps', long, lat, uuid)
             await client.pub.set(uuid, JSON.stringify(geoUser))
-            await client.pub.publish('mapsChannel', uuid)
+            await client.pub.publish('mapsChannel', username)
 
             return 'yep'
         }
