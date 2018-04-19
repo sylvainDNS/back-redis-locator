@@ -14,7 +14,7 @@
 
 ### Socket handshake parameter sample :
 
-`{"query": "params={\"uuid\":\"f65eebe2-aa4d-4fe5-80f4-0026e4cc47f7\", \"username\":\"dns\", \"long\":\"50\", \"lat\":\"50\", \"radius\":\"2\"}"}`
+`{"query": "params={\"username\":\"dns\", \"long\":\"50\", \"lat\":\"50\", \"radius\":\"2\"}"}`
 
 ### Listening events (client side) :
 
